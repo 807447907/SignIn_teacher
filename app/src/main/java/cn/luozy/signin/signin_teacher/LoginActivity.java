@@ -1,10 +1,12 @@
 package cn.luozy.signin.signin_teacher;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -25,13 +27,12 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
 
-/**
+/*
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends AppCompatActivity {
-    private final String loginURL = "https://signin.luozy.cn/api/teacher/login";
+    private String loginURL;
     private String teacher_id;
     private String teacher_token;
 
@@ -44,6 +45,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        loginURL = getString(R.string.url_login);
         mToast = Toast.makeText(LoginActivity.this, "", Toast.LENGTH_SHORT);
 
         editTextID = (EditText) findViewById(R.id.editTextID);
@@ -77,32 +79,37 @@ public class LoginActivity extends AppCompatActivity {
             super.handleMessage(msg);
             switch (msg.what) {
                 case 0:
-                    String resp = msg.getData().getString("resp");
+                    String resp = msg.getData().getString(getString(R.string.json_response));
                     try {
                         JSONTokener jsonTokener = new JSONTokener(resp);
                         JSONObject jsonObject = (JSONObject) jsonTokener.nextValue();
 
-                        if (jsonObject.getInt("status") == 0) {
-                            showTip(jsonObject.getString("msg"));
-                            teacher_token = jsonObject.getString("teacher_token");
-                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                            intent.putExtra("teacher_id", teacher_id);
-                            intent.putExtra("teacher_token", teacher_token);
-                            startActivity(intent);
+                        if (jsonObject.getInt(getString(R.string.json_status)) == 0) {
+                            showTip(jsonObject.getString(getString(R.string.json_message)));
+                            teacher_token = jsonObject.getString(getString(R.string.json_teacher_token));
+                            SharedPreferences sharedPref = getSharedPreferences(
+                                    getString(R.string.preference_login),
+                                    Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPref.edit();
+                            editor.clear();
+                            editor.putString(getString(R.string.preference_id_key), teacher_id)
+                                    .putString(getString(R.string.preference_token_key), teacher_token)
+                                    .apply();
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
                             finish();
                             return;
                         } else {
-                            JSONObject errors = jsonObject.getJSONObject("errors");
+                            JSONObject errors = jsonObject.getJSONObject(getString(R.string.json_errors));
                             boolean canFocus = true;
-                            if (errors.has("teacher_id")) {
-                                editTextID.setError(errors.getJSONArray("teacher_id").getString(0));
+                            if (errors.has(getString(R.string.json_teacher_id))) {
+                                editTextID.setError(errors.getJSONArray(getString(R.string.json_teacher_id)).getString(0));
                                 if (canFocus) {
                                     editTextID.requestFocus();
                                     canFocus = false;
                                 }
                             }
-                            if (errors.has("teacher_password")) {
-                                editTextPassword.setError(errors.getJSONArray("teacher_password").getString(0));
+                            if (errors.has(getString(R.string.json_teacher_password))) {
+                                editTextPassword.setError(errors.getJSONArray(getString(R.string.json_teacher_password)).getString(0));
                                 if (canFocus) {
                                     editTextPassword.requestFocus();
                                     canFocus = false;
@@ -123,12 +130,12 @@ public class LoginActivity extends AppCompatActivity {
         teacher_id = editTextID.getText().toString();
 
         Map<String, String> params = new HashMap<>();
-        params.put("teacher_id", editTextID.getText().toString());
-        params.put("teacher_password", editTextPassword.getText().toString());
+        params.put(getString(R.string.json_teacher_id), editTextID.getText().toString());
+        params.put(getString(R.string.json_teacher_password), editTextPassword.getText().toString());
         String resp = postRequest(loginURL, params);
         if (!resp.isEmpty()) {
             Bundle bundle = new Bundle();
-            bundle.putString("resp", resp);
+            bundle.putString(getString(R.string.json_response), resp);
             Message message = new Message();
             message.setData(bundle);
             message.what = 0;

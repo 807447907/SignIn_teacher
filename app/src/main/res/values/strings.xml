@@ -1,5 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SignIn_teacher</string>
+    <string name="app_name">教师签到_teacher</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -13,4 +14,77 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+
+    <!-- URL -->
+    <string name="url_create">https://signin.luozy.cn/api/teacher/create</string>
+    <string name="url_start">https://signin.luozy.cn/api/teacher/start</string>
+    <string name="url_stop">https://signin.luozy.cn/api/teacher/stop</string>
+    <string name="url_show_list">https://signin.luozy.cn/api/teacher/list</string>
+    <string name="url_login">https://signin.luozy.cn/api/teacher/login</string>
+    <string name="url_register">https://signin.luozy.cn/api/teacher/register</string>
+
+    <!-- json -->
+    <string name="json_response">resp</string>
+    <string name="json_status">status</string>
+    <string name="json_message">msg</string>
+    <string name="json_teacher_token">teacher_token</string>
+    <string name="json_errors">errors</string>
+    <string name="json_teacher_name">teacher_name</string>
+    <string name="json_teacher_id">teacher_id</string>
+    <string name="json_teacher_password">teacher_password</string>
+    <string name="json_sign_in_id">signIn_id</string>
+    <string name="json_sign_in_bluetooth">signIn_bluetooth</string>
+    <string name="json_sign_in_name">signIn_name</string>
+    <string name="json_sign_in_enable">signIn_enable</string>
+
+    
+    <!-- Preferences -->
+    <string name="preference_login">login</string>
+    <string name="preference_token_key">token</string>
+    <string name="preference_id_key">id</string>
+
+    <!-- Title -->
+    <string name="title_activity_register">教师注册</string>
+    <string name="title_activity_sign_in">所有签到</string>
+    <string name="title_activity_main">签到</string>
+
+    
+    <string name="menu_title_account">账户</string>
+    <string name="menu_title_options">选项</string>
+
+    <!-- Action -->
+    <string name="action_export">导出</string>
+    <string name="action_add_student">手动添加</string>
+    <string name="action_log_out">登出</string>
+    <string name="action_edit_password">修改密码</string>
+    <string name="action_edit_info">编辑信息</string>
+    <string name="action_archive">归档</string>
+    <string name="action_delete">删除</string>
+    <string name="action_edit_course_list">编辑课程列表</string>
+    <string name="action_settings">设置</string>
+    <string name="action_login_confirm">立即登录</string>
+    <string name="action_register_confirm">立即注册</string>
+    <string name="action_register">注册</string>
+    <string name="action_about">关于</string>
+
+    <!-- Hint -->
+    <string name="hint_id">教工号</string>
+    <string name="hint_password">密码</string>
+    <string name="hint_name">真实姓名</string>
+    
+    <!-- Content Description -->
+    <string name="content_description_status">状态</string>
+
+    <!-- Tip -->
+    <string name="tip_no_connection">无网络连接</string>
+    <string name="tip_no_bluetooth">设备不支持蓝牙</string>
+    <string name="tip_please_allow_bluetooth">请允许开启蓝牙</string>
+    <string name="tip_please_allow_bluetooth_discoverable">请允许开启蓝牙可见性</string>
+
+    
+    
+    <!-- Other -->
+    <string name="navigation_drawer_open">open</string>
+    <string name="navigation_drawer_close">close</string>
+
 </resources>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="@string/menu_title_account">
+        <menu>
+            <item
+                android:id="@+id/nav_log_out"
+                android:icon="@drawable/ic_nav_log_out"
+                android:title="@string/action_log_out"/>
+            <item
+                android:id="@+id/nav_edit_password"
+                android:icon="@drawable/ic_nav_edit_password"
+                android:title="@string/action_edit_password"/>
+        </menu>
+    </item>
+
+    <group android:checkableBehavior="single">
+        <item
+            android:icon="@drawable/ic_nav_all"
+            android:title="所有签到"
+            android:checked="true"/>
+
+        <item
+            android:icon="@drawable/ic_bullet_point"
+            android:title="JAVA程序设计"/>
+        <item
+            android:icon="@drawable/ic_bullet_point"
+            android:title="算法分析与设计"/>
+        <item
+            android:icon="@drawable/ic_bullet_point"
+            android:title="计算机系统"/>
+    </group>
+
+    <item
+        android:id="@+id/nav_edit_course"
+        android:icon="@drawable/ic_action_edit_list"
+        android:title="@string/action_edit_course_list"/>
+
+
+
+    <item android:title="@string/menu_title_options">
+        <menu>
+            <item
+                android:id="@+id/nav_settings"
+                android:icon="@drawable/ic_action_settings"
+                android:title="@string/action_settings"/>
+            <item
+                android:id="@+id/nav_about"
+                android:icon="@drawable/ic_action_about"
+                android:title="@string/action_about"/>
+        </menu>
+    </item>
+
+</menu>

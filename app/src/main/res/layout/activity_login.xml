@@ -31,7 +31,7 @@
                     android:id="@+id/editTextID"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="教工号/学号"
+                    android:hint="@string/hint_id"
                     android:inputType="number"
                     android:maxLines="1"
                     android:singleLine="true" />
@@ -46,7 +46,7 @@
                     android:id="@+id/editTextPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="密码"
+                    android:hint="@string/hint_password"
                     android:imeActionId="@+id/login"
                     android:imeActionLabel="@string/action_sign_in_short"
                     android:imeOptions="actionUnspecified"
@@ -62,11 +62,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="立即登录"
-                android:textStyle="bold" />
+                android:text="@string/action_login_confirm"
+                android:textStyle="bold"
+                android:textColor="#ffffff"
+                android:backgroundTint="@color/colorPrimary"
+                tools:backgroundTint="@color/colorPrimary"/>
 
             <TextView
-                android:text="注册账号"
+                android:text="@string/action_register"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/textViewRegister"

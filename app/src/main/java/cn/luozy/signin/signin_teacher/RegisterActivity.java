@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
-    private final String registerURL = "https://signin.luozy.cn/api/teacher/register";
+    private String registerURL;
 
     private Toast mToast;
 
@@ -37,6 +37,10 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        getSupportActionBar().setElevation(0f);
+
+
+        registerURL = getString(R.string.url_register);
         mToast = Toast.makeText(RegisterActivity.this, "", Toast.LENGTH_SHORT);
 
         editTextID = (EditText) findViewById(R.id.editTextID);
@@ -62,32 +66,32 @@ public class RegisterActivity extends AppCompatActivity {
             super.handleMessage(msg);
             switch (msg.what) {
                 case 0:
-                    String resp = msg.getData().getString("resp");
+                    String resp = msg.getData().getString(getString(R.string.json_response));
                     try {
                         JSONTokener jsonTokener = new JSONTokener(resp);
                         JSONObject jsonObject = (JSONObject) jsonTokener.nextValue();
-                        if (jsonObject.getInt("status") == 0) {
-                            showTip(jsonObject.getString("msg"));
+                        if (jsonObject.getInt(getString(R.string.json_status)) == 0) {
+                            showTip(jsonObject.getString(getString(R.string.json_message)));
                             finish();
                         } else {
-                            JSONObject errors = jsonObject.getJSONObject("errors");
+                            JSONObject errors = jsonObject.getJSONObject(getString(R.string.json_errors));
                             boolean canFocus = true;
-                            if (errors.has("teacher_id")) {
-                                editTextID.setError(errors.getJSONArray("teacher_id").getString(0));
+                            if (errors.has(getString(R.string.json_teacher_id))) {
+                                editTextID.setError(errors.getJSONArray(getString(R.string.json_teacher_id)).getString(0));
                                 if (canFocus) {
                                     editTextID.requestFocus();
                                     canFocus = false;
                                 }
                             }
-                            if (errors.has("teacher_name")) {
-                                editTextName.setError(errors.getJSONArray("teacher_name").getString(0));
+                            if (errors.has(getString(R.string.json_teacher_name))) {
+                                editTextName.setError(errors.getJSONArray(getString(R.string.json_teacher_name)).getString(0));
                                 if (canFocus) {
                                     editTextName.requestFocus();
                                     canFocus = false;
                                 }
                             }
-                            if (errors.has("teacher_password")) {
-                                editTextPassword.setError(errors.getJSONArray("teacher_password").getString(0));
+                            if (errors.has(getString(R.string.json_teacher_password))) {
+                                editTextPassword.setError(errors.getJSONArray(getString(R.string.json_teacher_password)).getString(0));
                                 if (canFocus) {
                                     editTextPassword.requestFocus();
                                     canFocus = false;
@@ -107,13 +111,13 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void attemptRegister() {
         Map<String, String> params = new HashMap<>();
-        params.put("teacher_id", editTextID.getText().toString());
-        params.put("teacher_password", editTextPassword.getText().toString());
-        params.put("teacher_name", editTextName.getText().toString());
+        params.put(getString(R.string.json_teacher_id), editTextID.getText().toString());
+        params.put(getString(R.string.json_teacher_password), editTextPassword.getText().toString());
+        params.put(getString(R.string.json_teacher_name), editTextName.getText().toString());
         String resp = postRequest(registerURL, params);
         if (resp != "") {
             Bundle bundle = new Bundle();
-            bundle.putString("resp", resp);
+            bundle.putString(getString(R.string.json_response), resp);
             Message message = new Message();
             message.setData(bundle);
             message.what = 0;
