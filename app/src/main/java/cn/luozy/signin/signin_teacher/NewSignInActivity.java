@@ -7,27 +7,44 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class NewSignInActivity extends AppCompatActivity {
+import static cn.luozy.signin.signin_teacher.Utility.postRequest;
+
+public class NewSignInActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+    private final String showCourseListURL = "https://signin.luozy.cn/api/teacher/course";
+    private final String course_root_url = "https://signin.luozy.cn/api/teacher/course/";
+
     private String teacher_id;
     private String teacher_token;
 
-    private Toast mToast;
+    private Spinner mSpinner;
 
     private SharedPreferences mSharedPref;
+
+    private final String json_teacher_id = "user_id";
+    private final String json_teacher_token = "token";
+    private final String json_error_message = "errmsg";
+
+    private int current_course_index;
+    private int current_course_id;
+
+    protected ArrayList<HashMap<String, Object>> courseList = new ArrayList<>();
 
     private Handler handler = new MyHandler(this);
 
@@ -45,18 +62,19 @@ public class NewSignInActivity extends AppCompatActivity {
         teacher_id = mSharedPref.getString(getString(R.string.preference_id_key), null);
         teacher_token = mSharedPref.getString(getString(R.string.preference_token_key), null);
 
-        mToast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
+        mSpinner = (Spinner)findViewById(R.id.spinnerCourse);
+        mSpinner.setOnItemSelectedListener(this);
+    }
 
-        Spinner spinner = (Spinner)findViewById(R.id.spinnerCourse);
-        String[] items = new String[]{
-                "算法分析与设计",
-                "JAVA程序设计",
-                "计算机系统",
-                "[编辑课程]"
-        };
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, items);
-        spinner.setAdapter(adapter);
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        new Thread() {
+            @Override
+            public void run() {
+                attemptGetCourseList();
+            }
+        }.start();
     }
 
     @Override
@@ -65,30 +83,67 @@ public class NewSignInActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.action_complete) {
-            new Thread() {
-                public void run() {
-                    attemptCreate(
-                            ((EditText)findViewById(R.id.editTextSignInName))
-                                    .getText().toString()
-                    );
-                }
-            }.start();
+            final String sign_in_name = ((EditText)findViewById(R.id.editTextSignInName))
+                    .getText().toString();
+            if (sign_in_name.length() > 0) {
+                new Thread() {
+                    public void run() {
+                        attemptCreate(sign_in_name);
+                    }
+                }.start();
+            } else {
+                Utility.showTip(this, "签到名称不能为空");
+            }
         }
         return super.onOptionsItemSelected(item);
     }
 
-    protected void attemptCreate(final String signIn_name) {
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        current_course_index = i;
+        current_course_id = (int)courseList.get(i).get("course_id");
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+    }
+
+    protected void attemptGetCourseList() {
+        Log.d("DDD", "attempt get coutse list");
         Map<String, String> params = new HashMap<>();
-        params.put(getString(R.string.json_sign_in_name), signIn_name);
+        params.put(json_teacher_id, teacher_id);
+        params.put(json_teacher_token, teacher_token);
+
+        String resp = postRequest(showCourseListURL, params);
+        Log.d("DDD", resp);
+        //noinspection StringEquality
+        if (!resp.isEmpty()) {
+            Bundle bundle = new Bundle();
+            bundle.putString("resp", resp);
+            Message message = new Message();
+            message.setData(bundle);
+            message.what = 10;
+            handler.sendMessage(message);
+        }
+    }
+
+    protected void attemptCreate(final String sign_in_name) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", sign_in_name);
         params.put(getString(R.string.json_teacher_id), teacher_id);
         params.put(getString(R.string.json_teacher_token), teacher_token);
 
-        String resp = MainActivity.postRequest(getString(R.string.url_create), params);
+        String url_create = course_root_url
+                        + current_course_id
+                        + "/sign_in/create";
+
+        Log.d("DDD", url_create);
+
+        String resp = postRequest(url_create, params);
         //noinspection StringEquality
         if (!resp.isEmpty()) {
             Bundle bundle = new Bundle();
@@ -115,47 +170,66 @@ public class NewSignInActivity extends AppCompatActivity {
                 case 0:
                     resp = msg.getData().getString(getString(R.string.json_response));
                     try {
-                        JSONTokener jsonTokener = new JSONTokener(resp);
-                        JSONObject jsonObject = (JSONObject) jsonTokener.nextValue();
-                        if (jsonObject.getInt(getString(R.string.json_status)) == 0) {
-                            mActivity.showTip(jsonObject.getString(getString(R.string.json_message)));
+                        JSONObject jsonObject = new JSONObject(resp);
+                        Log.d("DDD", "in Handler: "+resp);
+                        if (jsonObject.has(json_error_message)) {
+                            Utility.showTip(NewSignInActivity.this, jsonObject.getString(json_error_message));
+                            Intent intent = new Intent(NewSignInActivity.this, LoginActivity.class);
+                            startActivity(intent);
+                            finish();
+                            return;
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    Intent intent = new Intent(NewSignInActivity.this, MainActivity.class);
+                    intent.putExtra("course_index", current_course_index);
+                    startActivity(intent);
+                    finish();
+                    break;
+                case 10:
+                    Log.d("DDD", ""+msg.what);
+                    resp = msg.getData().getString("resp");
+                    ArrayList<HashMap<String, Object>> tempList = new ArrayList<>();
+                    try {
+                        JSONObject jsonObject = new JSONObject(resp);
+                        Log.d("DDD", "in Handler: "+resp);
+                        if (jsonObject.has(json_error_message)) {
+                            Utility.showTip(NewSignInActivity.this, jsonObject.getString(json_error_message));
+                            Intent mIntent = new Intent(NewSignInActivity.this, LoginActivity.class);
+                            startActivity(mIntent);
+                            finish();
+                            return;
                         } else {
-                            JSONObject errors = jsonObject.getJSONObject(getString(R.string.json_errors));
-                            boolean exit = false;
-                            String errorMsg = null;
-                            if (errors.has(getString(R.string.json_teacher_id))) {
-                                errorMsg = errors.getJSONArray(getString(R.string.json_teacher_id)).getString(0);
-                                exit = true;
-                            } else if (errors.has(getString(R.string.json_teacher_token))) {
-                                errorMsg = errors.getJSONArray(getString(R.string.json_teacher_token)).getString(0);
-                                exit = true;
-                            } else if (errors.has(getString(R.string.json_sign_in_name))) {
-                                errorMsg = errors.getJSONArray(getString(R.string.json_sign_in_name)).getString(0);
-                            }
-                            mActivity.showTip(errorMsg);
-                            if (exit) {
-                                Intent intent = new Intent(mActivity, LoginActivity.class);
-                                mActivity.startActivity(intent);
-                                mActivity.finish();
-                                return;
+                            JSONArray data = jsonObject.getJSONArray("list");
+                            Log.d("DDD", ""+data.length());
+                            for (int i = 0; i < data.length(); i++) {
+                                JSONObject item = data.getJSONObject(i);
+                                HashMap<String, Object> params = new HashMap<>();
+                                params.put("course_id", item.getInt("course_id"));
+                                params.put("course_name", item.getString("name"));
+                                tempList.add(params);
                             }
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    startActivity(new Intent(NewSignInActivity.this, MainActivity.class));
-                    finish();
+                    courseList.clear();
+                    courseList.addAll(tempList);
+
+                    ArrayList<String> courseItems = new ArrayList<String>();
+                    for (int i = 0; i < courseList.size(); i++)
+                        courseItems.add(courseList.get(i).get("course_name").toString());
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                            NewSignInActivity.this,
+                            android.R.layout.simple_spinner_dropdown_item,
+                            courseItems);
+                    mSpinner.setAdapter(adapter);
                     break;
                 default:
                     break;
             }
         }
-    }
-
-    protected void showTip(final String str) {
-
-        mToast.setText(str);
-        mToast.show();
-
     }
 }

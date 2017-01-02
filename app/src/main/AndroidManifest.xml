@@ -34,6 +34,7 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
@@ -41,8 +42,7 @@
             android:name=".NewSignInActivity"
             android:label="新签到"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/PlainTheme"
-            >
+            android:theme="@style/PlainTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity"/>
@@ -51,8 +51,15 @@
             android:name=".SignInActivity"
             android:label="@string/title_activity_sign_in"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            >
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="cn.luozy.signin.signin_teacher.MainActivity"/>
+        </activity>
+        <activity android:name=".CourseListActivity"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/PlainTheme"
+            android:label="@string/title_course_list_activity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="cn.luozy.signin.signin_teacher.MainActivity"/>

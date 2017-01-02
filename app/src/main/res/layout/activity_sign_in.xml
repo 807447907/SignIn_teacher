@@ -59,7 +59,7 @@
                         android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/textview_sign_in_name"
+                            android:id="@+id/text_view_course_name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textColor="#FFFFFF"
@@ -69,7 +69,7 @@
                             android:singleLine="true"/>
 
                         <TextView
-                            android:id="@+id/textview_sign_in_id"
+                            android:id="@+id/text_view_sign_in_name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textColor="#FFFFFF"
@@ -79,6 +79,7 @@
                             android:textAppearance="@android:style/TextAppearance.Small"/>
 
                         <TextView
+                            android:id="@+id/text_view_time"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textColor="#FFFFFF"
@@ -96,20 +97,12 @@
                         android:gravity="right">
 
                         <TextView
+                            android:id="@+id/text_view_num_signed"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="60sp"
                             android:textColor="#FFFFFF"
                             android:text="78"
-                            tools:fontFamily="sans-serif-condensed"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="24sp"
-                            android:textColor="#FFFFFF"
-                            android:paddingRight="8dp"
-                            android:text="150"
                             tools:fontFamily="sans-serif-condensed"/>
 
                     </LinearLayout>

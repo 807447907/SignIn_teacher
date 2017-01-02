@@ -1,180 +1,32 @@
 package cn.luozy.signin.signin_teacher;
 
-import android.os.Handler;
-import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import android.support.v7.app.AppCompatActivity;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 public class RegisterActivity extends AppCompatActivity {
     private String registerURL;
 
-    private Toast mToast;
-
-    private EditText editTextID;
-    private EditText editTextPassword;
-    private EditText editTextName;
+    private WebView mWebView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        getSupportActionBar().setElevation(0f);
-
+        Utility.checkConnection(this);
 
         registerURL = getString(R.string.url_register);
-        mToast = Toast.makeText(RegisterActivity.this, "", Toast.LENGTH_SHORT);
 
-        editTextID = (EditText) findViewById(R.id.editTextID);
-        editTextPassword = (EditText) findViewById(R.id.editTextPassword);
-        editTextName = (EditText) findViewById(R.id.editTextName);
-
-        Button buttonSignIn = (Button) findViewById(R.id.buttonSignIn);
-        buttonSignIn.setOnClickListener(new View.OnClickListener() {
+        mWebView = (WebView)findViewById(R.id.web_view_register);
+        mWebView.setWebViewClient(new WebViewClient(){
             @Override
-            public void onClick(View view) {
-                new Thread() {
-                    public void run() {
-                        attemptRegister();
-                    }
-                }.start();
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                view.loadUrl(url);
+                return true;
             }
         });
-    }
-
-    Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case 0:
-                    String resp = msg.getData().getString(getString(R.string.json_response));
-                    try {
-                        JSONTokener jsonTokener = new JSONTokener(resp);
-                        JSONObject jsonObject = (JSONObject) jsonTokener.nextValue();
-                        if (jsonObject.getInt(getString(R.string.json_status)) == 0) {
-                            showTip(jsonObject.getString(getString(R.string.json_message)));
-                            finish();
-                        } else {
-                            JSONObject errors = jsonObject.getJSONObject(getString(R.string.json_errors));
-                            boolean canFocus = true;
-                            if (errors.has(getString(R.string.json_teacher_id))) {
-                                editTextID.setError(errors.getJSONArray(getString(R.string.json_teacher_id)).getString(0));
-                                if (canFocus) {
-                                    editTextID.requestFocus();
-                                    canFocus = false;
-                                }
-                            }
-                            if (errors.has(getString(R.string.json_teacher_name))) {
-                                editTextName.setError(errors.getJSONArray(getString(R.string.json_teacher_name)).getString(0));
-                                if (canFocus) {
-                                    editTextName.requestFocus();
-                                    canFocus = false;
-                                }
-                            }
-                            if (errors.has(getString(R.string.json_teacher_password))) {
-                                editTextPassword.setError(errors.getJSONArray(getString(R.string.json_teacher_password)).getString(0));
-                                if (canFocus) {
-                                    editTextPassword.requestFocus();
-                                    canFocus = false;
-                                }
-                            }
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
-
-
-    private void attemptRegister() {
-        Map<String, String> params = new HashMap<>();
-        params.put(getString(R.string.json_teacher_id), editTextID.getText().toString());
-        params.put(getString(R.string.json_teacher_password), editTextPassword.getText().toString());
-        params.put(getString(R.string.json_teacher_name), editTextName.getText().toString());
-        String resp = postRequest(registerURL, params);
-        if (resp != "") {
-            Bundle bundle = new Bundle();
-            bundle.putString(getString(R.string.json_response), resp);
-            Message message = new Message();
-            message.setData(bundle);
-            message.what = 0;
-            handler.sendMessage(message);
-        }
-    }
-
-
-    private void showTip(final String str) {
-        mToast.setText(str);
-        mToast.show();
-    }
-
-    public static String buildParam(Map<String, String> params) {
-        String res = "";
-        try {
-            Iterator<Map.Entry<String, String>> it = params.entrySet().iterator();
-            Map.Entry<String, String> entry;
-            if (it.hasNext()) {
-                entry = it.next();
-                res += entry.getKey() + "=" + java.net.URLEncoder.encode(entry.getValue(), "UTF-8");
-            }
-            while (it.hasNext()) {
-                entry = it.next();
-                res += "&" + entry.getKey() + "=" + java.net.URLEncoder.encode(entry.getValue(), "UTF-8");
-            }
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return res;
-    }
-
-    public static String postRequest(String path, Map<String, String> params) {
-        URL url;
-        String resp = "";
-        try {
-            url = new URL(path);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setConnectTimeout(1000);
-            conn.setReadTimeout(1000);
-            conn.setDoOutput(true);
-            conn.setDoInput(true);
-
-            PrintWriter printWriter = new PrintWriter(conn.getOutputStream());
-            printWriter.write(buildParam(params));
-            printWriter.flush();
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String line;
-
-            while ((line = br.readLine()) != null) {
-                resp += line;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return resp;
+        mWebView.loadUrl(registerURL);
     }
 }

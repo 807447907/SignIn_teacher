@@ -4,27 +4,6 @@
       tools:context="cn.luozy.signin.signin_teacher.SignInActivity">
 
     <item
-        android:id="@+id/action_add_student"
-        android:title="@string/action_add_student"
-        android:icon="@mipmap/ic_action_add"
-        app:showAsAction="ifRoom"/>
-
-    <item
-        android:id="@+id/action_export"
-        android:title="@string/action_export"
-        app:showAsAction="never"/>
-
-    <item
-        android:id="@+id/action_edit"
-        android:title="@string/action_edit_info"
-        app:showAsAction="never"/>
-
-    <item
-        android:id="@+id/action_archive"
-        android:title="@string/action_archive"
-        app:showAsAction="never"/>
-
-    <item
         android:id="@+id/action_delete"
         android:title="@string/action_delete"
         app:showAsAction="never"/>

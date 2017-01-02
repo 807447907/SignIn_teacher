@@ -43,8 +43,10 @@ public class SignInAdapter extends BaseAdapter {
             convertView = View.inflate(mContext, R.layout.sign_in_list_item, null);
             viewHolder = new ViewHolder();
 
-            viewHolder.textViewIndex = (TextView) convertView.findViewById(R.id.textview_index);
-            viewHolder.textViewTitle = (TextView) convertView.findViewById(R.id.textview_title);
+            viewHolder.textViewName = (TextView) convertView.findViewById(R.id.text_view_name);
+            viewHolder.textViewCourse = (TextView) convertView.findViewById(R.id.text_view_course);
+            viewHolder.textViewTime = (TextView) convertView.findViewById(R.id.text_view_time);
+            viewHolder.textViewNumRecords = (TextView) convertView.findViewById(R.id.text_view_num_records);
             viewHolder.imageStatus = (ImageView) convertView.findViewById(R.id.ic_state);
 
             convertView.setTag(viewHolder);
@@ -52,13 +54,18 @@ public class SignInAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        final Integer signIn_id = (int) signInList.get(position).get("signIn_id");
-        final String signIn_name = signInList.get(position).get("signIn_name").toString();
+        final int sign_in_id = (int) signInList.get(position).get("sign_in_id");
+        final int sign_in_num_records = (int) signInList.get(position).get("sign_in_num_records");
+        final String sign_in_name = signInList.get(position).get("sign_in_name").toString();
+        final String sign_in_course = signInList.get(position).get("sign_in_course").toString();
+        final String sign_in_time = signInList.get(position).get("sign_in_time").toString();
+        boolean enable = (boolean) signInList.get(position).get("sign_in_state");
 
-        viewHolder.textViewIndex.setText("第" + signIn_id.toString() + "次");
-        viewHolder.textViewTitle.setText(signIn_name);
+        viewHolder.textViewCourse.setText(sign_in_course);
+        viewHolder.textViewName.setText(sign_in_name);
+        viewHolder.textViewTime.setText(sign_in_time);
+        viewHolder.textViewNumRecords.setText(""+sign_in_num_records);
 
-        boolean enable = (boolean) signInList.get(position).get("signIn_enable");
         if (enable) {
             viewHolder.imageStatus.setImageResource(R.drawable.ic_bullet_point_active);
         } else {
@@ -68,8 +75,10 @@ public class SignInAdapter extends BaseAdapter {
     }
 
     private class ViewHolder {
-        TextView textViewIndex;
-        TextView textViewTitle;
+        TextView textViewName;
+        TextView textViewCourse;
+        TextView textViewTime;
+        TextView textViewNumRecords;
         ImageView imageStatus;
     }
 }
